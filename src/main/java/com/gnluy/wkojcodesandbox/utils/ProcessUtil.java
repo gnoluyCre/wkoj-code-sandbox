@@ -2,12 +2,13 @@ package com.gnluy.wkojcodesandbox.utils;
 
 import cn.hutool.core.util.StrUtil;
 import com.gnluy.wkojcodesandbox.enums.ProcessExitValueEnum;
-import com.gnluy.wkojcodesandbox.model.ExecuteMessage;
+import com.gnluy.wkojcodesandbox.controller.model.ExecuteMessage;
 import org.springframework.util.StopWatch;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.concurrent.*;
 
 /**
  * @author IGR
@@ -17,6 +18,8 @@ import java.util.ArrayList;
  */
 public class ProcessUtil {
 
+    private static final Long JAVA_MAX_TIMEOUT = 5000L;
+
     /**
      * 执行process 返回ExecuteMessage
      * @param runProcess
@@ -25,46 +28,48 @@ public class ProcessUtil {
      */
     public static ExecuteMessage runProcessAndGetMessage(Process runProcess, String opName) {
         ExecuteMessage executeMessage = new ExecuteMessage();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
         int exitValue = 0;
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            exitValue = runProcess.waitFor();
+            // 超时控制
+            Callable<Integer> task = runProcess::waitFor;
+            Future<Integer> future = executor.submit(task);
+            //exitValue = runProcess.waitFor();
+            try {
+                exitValue = future.get(JAVA_MAX_TIMEOUT, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                throw e;
+            } finally {
+                executor.shutdown();
+            }
+
             executeMessage.setExitValue(exitValue);
             BufferedReader bufferedReader;
             ArrayList cmdOutputStrList;
             String cmdOutputLine;
             if (exitValue == ProcessExitValueEnum.SUCCESS.getValue()) {
                 System.out.println(opName + "成功");
-
                 //逐行获取控制台输出信息
                 bufferedReader = new BufferedReader(new InputStreamReader(runProcess.getInputStream()));
-                cmdOutputStrList = new ArrayList();
-
-                while((cmdOutputLine = bufferedReader.readLine()) != null) {
-                    cmdOutputStrList.add(cmdOutputLine);
-                }
-
-                executeMessage.setMessage(StringUtils.join(cmdOutputStrList, "\n"));
             } else {
                 System.out.println(opName + "失败 错误码：" + exitValue);
-
                 //逐行获取控制台输出信息
                 bufferedReader = new BufferedReader(new InputStreamReader(runProcess.getErrorStream()));
-                cmdOutputStrList = new ArrayList();
 
-                while((cmdOutputLine = bufferedReader.readLine()) != null) {
-                    cmdOutputStrList.add(cmdOutputLine);
-                }
-
-                executeMessage.setMessage(StringUtils.join(cmdOutputStrList, "\n"));
             }
+            cmdOutputStrList = new ArrayList<>();
+            while((cmdOutputLine = bufferedReader.readLine()) != null) {
+                cmdOutputStrList.add(cmdOutputLine);
+            }
+            executeMessage.setMessage(StringUtils.join(cmdOutputStrList, "\n"));
 
             stopWatch.stop();
             executeMessage.setTime(stopWatch.getLastTaskTimeMillis());
             return executeMessage;
-        } catch (IOException | InterruptedException var8) {
-            throw new RuntimeException(var8);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

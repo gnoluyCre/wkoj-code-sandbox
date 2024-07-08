@@ -1,13 +1,12 @@
 package com.gnluy.wkojcodesandbox;
 
 import cn.hutool.core.io.FileUtil;
-import com.gnluy.wkojcodesandbox.enums.ExecuteCodeStatusEnum;
 import com.gnluy.wkojcodesandbox.controller.model.ExecuteCodeRequest;
 import com.gnluy.wkojcodesandbox.controller.model.ExecuteCodeResponse;
 import com.gnluy.wkojcodesandbox.controller.model.ExecuteMessage;
 import com.gnluy.wkojcodesandbox.controller.model.JudgeInfo;
+import com.gnluy.wkojcodesandbox.enums.ExecuteCodeStatusEnum;
 import com.gnluy.wkojcodesandbox.utils.ProcessUtil;
-import org.springframework.util.ObjectUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class JavaNativeCodeSandBox implements CodeSandBox {
+public class JavaDockerCodeSandBox implements CodeSandBox {
     private final String GLOBAL_CODE_DIR_NAME = "tmpCode";
     private final String GLOBAL_JAVA_CLASS_NAME = "Main.java";
 

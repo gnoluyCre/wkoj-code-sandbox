@@ -1,14 +1,12 @@
 package com.gnluy.wkojcodesandbox;
 
 import cn.hutool.core.io.resource.ResourceUtil;
-import com.gnluy.wkojcodesandbox.model.ExecuteCodeRequest;
-import com.gnluy.wkojcodesandbox.model.ExecuteCodeResponse;
+import com.gnluy.wkojcodesandbox.controller.model.ExecuteCodeRequest;
+import com.gnluy.wkojcodesandbox.controller.model.ExecuteCodeResponse;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class JavaNativeCodeSandBoxTest {
 

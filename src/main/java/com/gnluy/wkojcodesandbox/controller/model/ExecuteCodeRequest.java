@@ -1,4 +1,4 @@
-package com.gnluy.wkojcodesandbox.model;
+package com.gnluy.wkojcodesandbox.controller.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

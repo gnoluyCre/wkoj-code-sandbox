@@ -6,6 +6,7 @@ public class Main {
         Scanner cin = new Scanner(System.in);
         int a = cin.nextInt();
         int b = cin.nextInt();
+        Thread.sleep(50000L);
         System.out.println(a + b);
     }
 }
